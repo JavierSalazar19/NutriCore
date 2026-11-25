@@ -8,6 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
   populatePatientSelector();
   loadPatientIntoForm(currentPatientId);
   bindEvents();
+  registerServiceWorker();
+  initInstallPrompt();
 });
 
 // 1. Navegación por pestañas (A a F)
@@ -843,5 +845,46 @@ function bindEvents() {
     document.getElementById("newPatientModal").classList.add("hidden");
     e.target.reset();
     toggleGuardianFields();
+  });
+}
+
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) return;
+
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("./service-worker.js")
+      .then((reg) => {
+        console.log("NutriCore Service Worker registrado:", reg.scope);
+      })
+      .catch((err) => {
+        console.warn("Error al registrar Service Worker:", err);
+      });
+  });
+}
+
+let deferredInstallPrompt = null;
+
+function initInstallPrompt() {
+  const btnInstall = document.getElementById("btnInstallApp");
+  if (!btnInstall) return;
+
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    btnInstall.classList.remove("hidden");
+  });
+
+  btnInstall.addEventListener("click", async () => {
+    if (!deferredInstallPrompt) return;
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    btnInstall.classList.add("hidden");
+  });
+
+  window.addEventListener("appinstalled", () => {
+    deferredInstallPrompt = null;
+    btnInstall.classList.add("hidden");
   });
 }

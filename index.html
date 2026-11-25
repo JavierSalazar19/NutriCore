@@ -4,6 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NutriCore SaaS — Evaluación Nutricional Integral</title>
+
+  <!-- PWA / Instalación en dispositivos -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#0d9488" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="NutriCore" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
@@ -45,7 +55,10 @@
           <select id="patientSelect"></select>
           <button id="btnNewPatient" class="btn btn-outline">+ Nuevo Paciente</button>
         </div>
-        <div class="topbar-actions">
+        <div class="topbar-actions" style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+          <button id="btnInstallApp" class="btn btn-outline hidden" type="button">
+            📲 Instalar App
+          </button>
           <button id="btnGenerateReport" class="btn btn-primary">
             Guardar y Generar Reporte
           </button>

@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NutriCore SaaS — Evaluación Nutricional Integral</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Barra Lateral -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">NC</div>
+        <div>
+          <h1>NutriCore</h1>
+          <span>Plataforma Clínica</span>
+        </div>
+      </div>
+
+      <nav class="side-nav">
+        <button class="nav-item active" data-section="evaluacion">
+          📋 Evaluación Nutricional
+        </button>
+        <button class="nav-item disabled" title="Próximo módulo">
+          🥗 Cálculo y Menús (Próximamente)
+        </button>
+        <button class="nav-item disabled" title="Próximo módulo">
+          📈 Evolución del Paciente (Próximamente)
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="plan-badge">Plan Pro Activo</span>
+        <p>Modo Prototipo Local v1.6</p>
+      </div>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+      <!-- Barra Superior de Paciente -->
+      <header class="topbar">
+        <div class="patient-selector-group">
+          <label for="patientSelect">Paciente en consulta:</label>
+          <select id="patientSelect"></select>
+          <button id="btnNewPatient" class="btn btn-outline">+ Nuevo Paciente</button>
+        </div>
+        <div class="topbar-actions">
+          <button id="btnGenerateReport" class="btn btn-primary">
+            Guardar y Generar Reporte
+          </button>
+        </div>
+      </header>
+
+      <!-- Ficha Resumen del Paciente -->
+      <section class="patient-banner" id="patientBanner">
+        <div>
+          <h2 id="pName">—</h2>
+          <p id="pMeta">—</p>
+        </div>
+        <div class="banner-kpis">
+          <div class="kpi-pill">
+            <span>IMC Actual</span>
+            <strong id="topImc">—</strong>
+          </div>
+          <div class="kpi-pill">
+            <span>% Grasa (Prom. ISAK)</span>
+            <strong id="topGrasa">—</strong>
+          </div>
+          <div class="kpi-pill">
+            <span>Somatotipo</span>
+            <strong id="topSomato">—</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pestañas del Modelo (A a F) -->
+      <div class="tabs-bar">
+        <button class="tab-btn active" data-tab="tab-antecedentes">A. Antecedentes</button>
+        <button class="tab-btn" data-tab="tab-antropo">B. Antropométrica (ISAK / BIA / OMS)</button>
+        <button class="tab-btn" data-tab="tab-bioquimica">C. Bioquímica</button>
+        <button class="tab-btn" data-tab="tab-clinica">D. Clínica</button>
+        <button class="tab-btn" data-tab="tab-dietetica">E. Dietética</button>
+        <button class="tab-btn" data-tab="tab-estilo">F. Estilos de Vida</button>
+      </div>
+
+      <!-- ==================== PESTAÑA A: ANTECEDENTES ==================== -->
+      <section id="tab-antecedentes" class="tab-panel active">
+        <div class="grid-2">
+          <div class="card">
+            <h3>1. Información Personal y Contacto</h3>
+            <div class="form-grid-2">
+              <div class="field">
+                <label>Nombre completo</label>
+                <input type="text" id="ant_nombre" placeholder="Nombre del paciente" />
+              </div>
+              <div class="field">
+                <label>Fecha de nacimiento</label>
+                <input type="date" id="ant_fecha_nac" class="calc-trigger" />
+              </div>
+              <div class="field">
+                <label>Edad (años)</label>
+                <input type="number" min="0" max="110" id="ant_edad" class="calc-trigger" />
+              </div>
+              <div class="field">
+                <label>Sexo biológico</label>
+                <select id="ant_sexo" class="calc-trigger">
+                  <option value="F">Femenino</option>
+                  <option value="M">Masculino</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Teléfono / WhatsApp</label>
+                <input type="tel" id="ant_telefono" placeholder="Ej. 644 123 4567" />
+              </div>
+              <div class="field">
+                <label>Correo electrónico</label>
+                <input type="email" id="ant_correo" placeholder="correo@ejemplo.com" />
+              </div>
+              <div class="field">
+                <label>Ocupación / Actividad principal</label>
+                <input type="text" id="ant_ocupacion" placeholder="Ej. Estudiante, oficina, comercio..." />
+              </div>
+              <div class="field">
+                <label>Estado civil</label>
+                <select id="ant_estado_civil">
+                  <option value="">Seleccionar...</option>
+                  <option value="Soltero(a)">Soltero(a)</option>
+                  <option value="Casado(a)">Casado(a)</option>
+                  <option value="Unión libre">Unión libre</option>
+                  <option value="Divorciado(a)">Divorciado(a)</option>
+                  <option value="Viudo(a)">Viudo(a)</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label>Domicilio / Ciudad</label>
+              <input type="text" id="ant_domicilio" placeholder="Calle, colonia, ciudad" />
+            </div>
+            <div class="field">
+              <label>Contacto de emergencia</label>
+              <input type="text" id="ant_emergencia" placeholder="Nombre, parentesco y teléfono" />
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>2. Antecedentes Personales y Heredofamiliares</h3>
+            <div class="field">
+              <label>Objetivo / Motivo principal de consulta</label>
+              <input type="text" id="ant_objetivo" placeholder="Ej. Control metabólico, ganancia muscular..." />
+            </div>
+            <div class="field">
+              <label>Antecedentes Personales Patológicos (enfermedades crónicas, cirugías, hospitalizaciones)</label>
+              <textarea id="ant_patologicos" rows="3" placeholder="Ej. Diabetes tipo 2, hipertensión, SOP, cirugía previa..."></textarea>
+            </div>
+            <div class="field">
+              <label>Antecedentes Personales No Patológicos (entorno, turnos, inmunizaciones, hábitos generales)</label>
+              <textarea id="ant_no_patologicos" rows="3" placeholder="Ej. Turnos rotativos, exposición laboral, vacunas..."></textarea>
+            </div>
+            <div class="field">
+              <label>Antecedentes Heredofamiliares (padres, abuelos, hermanos)</label>
+              <textarea id="ant_heredofamiliares" rows="3" placeholder="Ej. Padre con DM2 e HTA, madre con hipotiroidismo..."></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== PESTAÑA B: ANTROPOMÉTRICA ==================== -->
+      <section id="tab-antropo" class="tab-panel">
+        <!-- 1. Medidas Clave e Índices Rápidos -->
+        <div class="grid-2">
+          <div class="card">
+            <h3>1. Medidas Clave e Índices Rápidos</h3>
+            <div class="form-grid-4">
+              <div class="field">
+                <label>Cintura mínima (cm)</label>
+                <input type="number" step="0.1" id="ant_cintura" class="calc-trigger" />
+              </div>
+              <div class="field">
+                <label>Cintura nivel umbilical (cm)</label>
+                <input type="number" step="0.1" id="ant_cintura_umbilical" class="calc-trigger" />
+              </div>
+              <div class="field">
+                <label>Cadera máxima (cm)</label>
+                <input type="number" step="0.1" id="ant_cadera" class="calc-trigger" />
+              </div>
+              <div class="field">
+                <label>Muñeca (cm)</label>
+                <input type="number" step="0.1" id="ant_muneca" class="calc-trigger" />
+              </div>
+            </div>
+            <div class="results-grid" style="margin-top: 0.5rem;">
+              <div class="res-box">
+                <span>IMC (kg/m²)</span>
+                <strong id="res_imc">—</strong>
+                <small id="res_imc_dx">—</small>
+              </div>
+              <div class="res-box">
+                <span>ICC (Cintura/Cadera)</span>
+                <strong id="res_icc">—</strong>
+                <small id="res_icc_dx">—</small>
+              </div>
+              <div class="res-box">
+                <span>ICT (Cintura/Talla)</span>
+                <strong id="res_ict">—</strong>
+                <small id="res_ict_dx">—</small>
+              </div>
+              <div class="res-box">
+                <span>Complexión Ósea</span>
+                <strong id="res_complexion">—</strong>
+                <small id="res_complexion_dx">—</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Bioimpedancia Eléctrica (BIA) -->
+          <div class="card">
+            <div class="card-header-flex">
+              <h3>2. Bioimpedancia Eléctrica (BIA)</h3>
+              <button type="button" id="btnAddBiaExtra" class="btn btn-sm btn-outline">+ Añadir Medición BIA</button>
+            </div>
+            <div class="form-grid-3">
+              <div class="field">
+                <label>% Grasa BIA</label>
+                <input type="number" step="0.1" id="bia_grasa" class="calc-trigger" />
+              </div>
+              <div class="field">
+                <label>Masa Muscular (kg)</label>
+                <input type="number" step="0.1" id="bia_musculo" class="calc-trigger" />
+              </div>
+              <div class="field">
+                <label>Agua Corporal (%)</label>
+                <input type="number" step="0.1" id="bia_agua" class="calc-trigger" />
+              </div>
+              <div class="field">
+                <label>Grasa Visceral</label>
+                <input type="number" step="1" id="bia_visceral" class="calc-trigger" />
+              </div>
+              <div class="field">
+                <label>Masa Ósea (kg)</label>
+                <input type="number" step="0.1" id="bia_osea" class="calc-trigger" />
+              </div>
+              <div class="field">
+                <label>TMB Báscula (kcal)</label>
+                <input type="number" step="1" id="bia_tmb" class="calc-trigger" />
+              </div>
+            </div>
+
+            <div style="margin-top: 0.65rem;">
+              <small style="color: var(--text-muted); font-weight: 600;">Mediciones adicionales de BIA (ej. Ángulo de fase, Agua extracelular, Grasa segmentaria):</small>
+              <table class="data-table" style="margin-top: 0.4rem;">
+                <thead>
+                  <tr>
+                    <th>Parámetro BIA</th>
+                    <th>Valor</th>
+                    <th>Unidad / Nota</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="biaExtraTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== SECCIÓN PEDIÁTRICA (ESTÁNDARES OMS) ==================== -->
+        <div class="card pediatric-card" style="margin-bottom: 1.25rem;">
+          <div class="card-header-flex" style="flex-wrap: wrap;">
+            <div>
+              <h3>👶 Evaluación Antropométrica Pediátrica (Estándares de Crecimiento OMS)</h3>
+              <p style="font-size: 0.82rem; color: var(--text-muted);">
+                Cálculo automático de Z-score y percentil mediante parámetros LMS de la OMS según edad en meses y sexo biológico.
+              </p>
+            </div>
+            <label class="toggle-pill">
+              <input type="checkbox" id="ped_habilitado" class="calc-trigger" />
+              <span>Mostrar / Evaluar módulo pediátrico</span>
+            </label>
+          </div>
+
+          <div id="pediatricContent">
+            <div class="form-grid-4" style="margin-bottom: 0.85rem;">
+              <div class="field">
+                <label>Edad exacta (meses)</label>
+                <input type="number" step="1" min="0" max="228" id="ped_edad_meses" class="calc-trigger" placeholder="Ej. 36" />
+              </div>
+              <div class="field">
+                <label>Posición de medición</label>
+                <select id="ped_posicion" class="calc-trigger">
+                  <option value="longitud">Longitud acostado (&lt; 24 meses)</option>
+                  <option value="estatura">Estatura de pie (&ge; 24 meses)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Circunferencia craneal / cefálica (cm)</label>
+                <input type="number" step="0.1" id="ped_cefalica" class="calc-trigger" placeholder="Ej. 49.5" />
+              </div>
+              <div class="field">
+                <label>Circunferencia del brazo MUAC (cm)</label>
+                <input type="number" step="0.1" id="ped_brazo" class="calc-trigger" placeholder="Toma brazo relajado si vacío" />
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table pediatric-table">
+                <thead>
+                  <tr>
+                    <th>Indicador OMS</th>
+                    <th>Dato del Paciente</th>
+                    <th>Z-Score (DE)</th>
+                    <th>Percentil</th>
+                    <th>Interpretación Clínica OMS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>1. Longitud / Estatura para la edad</strong> <small class="muted-block">(0 a 19 años)</small></td>
+                    <td id="ped_val_talla_edad">—</td>
+                    <td><strong id="ped_z_talla_edad">—</strong></td>
+                    <td><span class="pct-badge" id="ped_p_talla_edad">—</span></td>
+                    <td id="ped_dx_talla_edad">—</td>
+                  </tr>
+                  <tr>
+                    <td><strong>2. Peso para la edad</strong> <small class="muted-block">(0 a 10 años)</small></td>
+                    <td id="ped_val_peso_edad">—</td>
+                    <td><strong id="ped_z_peso_edad">—</strong></td>
+                    <td><span class="pct-badge" id="ped_p_peso_edad">—</span></td>
+                    <td id="ped_dx_peso_edad">—</td>
+                  </tr>
+                  <tr>
+                    <td><strong>3. Peso en relación a la longitud / altura</strong> <small class="muted-block">(45 a 120 cm)</small></td>
+                    <td id="ped_val_peso_talla">—</td>
+                    <td><strong id="ped_z_peso_talla">—</strong></td>
+                    <td><span class="pct-badge" id="ped_p_peso_talla">—</span></td>
+                    <td id="ped_dx_peso_talla">—</td>
+                  </tr>
+                  <tr>
+                    <td><strong>4. Circunferencia craneal para la edad</strong> <small class="muted-block">(0 a 5 años)</small></td>
+                    <td id="ped_val_cefalica">—</td>
+                    <td><strong id="ped_z_cefalica">—</strong></td>
+                    <td><span class="pct-badge" id="ped_p_cefalica">—</span></td>
+                    <td id="ped_dx_cefalica">—</td>
+                  </tr>
+                  <tr>
+                    <td><strong>5. Circunferencia del brazo para la edad</strong> <small class="muted-block">(3 meses a 5 años)</small></td>
+                    <td id="ped_val_brazo">—</td>
+                    <td><strong id="ped_z_brazo">—</strong></td>
+                    <td><span class="pct-badge" id="ped_p_brazo">—</span></td>
+                    <td id="ped_dx_brazo">—</td>
+                  </tr>
+                  <tr>
+                    <td><strong>6. Pliegue cutáneo subescapular para la edad</strong> <small class="muted-block">(3 meses a 5 años)</small></td>
+                    <td id="ped_val_subescapular">—</td>
+                    <td><strong id="ped_z_subescapular">—</strong></td>
+                    <td><span class="pct-badge" id="ped_p_subescapular">—</span></td>
+                    <td id="ped_dx_subescapular">—</td>
+                  </tr>
+                  <tr>
+                    <td><strong>7. Pliegue cutáneo del tríceps para la edad</strong> <small class="muted-block">(3 meses a 5 años)</small></td>
+                    <td id="ped_val_triceps">—</td>
+                    <td><strong id="ped_z_triceps">—</strong></td>
+                    <td><span class="pct-badge" id="ped_p_triceps">—</span></td>
+                    <td id="ped_dx_triceps">—</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Selector de Perfil ISAK: Restringido (21) y Completo (43) -->
+        <div class="card" style="margin-bottom: 1.25rem;">
+          <div class="card-header-flex" style="flex-wrap: wrap;">
+            <div>
+              <h3>3. Protocolo Antropométrico ISAK</h3>
+              <p style="font-size: 0.82rem; color: var(--text-muted);">
+                El Perfil Restringido incluye las 21 mediciones base. Activa el Perfil Completo para capturar las 43 mediciones ISAK.
+              </p>
+            </div>
+            <div class="isak-mode-switch">
+              <button type="button" class="btn btn-sm btn-primary isak-mode-btn active" data-isak="restricted">
+                Perfil Restringido (21 mediciones)
+              </button>
+              <button type="button" class="btn btn-sm btn-outline isak-mode-btn" data-isak="full">
+                Perfil Completo (43 mediciones)
+              </button>
+            </div>
+          </div>
+
+          <!-- Contenedor de 21 mediciones (Perfil Restringido) -->
+          <div id="isakRestrictedContainer">
+            <h4 class="isak-sub">A. Básicos y Referencia (4 mediciones del núcleo restringido)</h4>
+            <div class="form-grid-4">
+              <div class="field"><label>1. Masa corporal / Peso (kg)</label><input type="number" step="0.1" id="ant_peso" class="calc-trigger" /></div>
+              <div class="field"><label>2. Talla / Longitud / Estatura (cm)</label><input type="number" step="0.1" id="ant_talla" class="calc-trigger" /></div>
+              <div class="field"><label>3. Talla sentado (cm)</label><input type="number" step="0.1" id="isak_talla_sentado" class="calc-trigger" /></div>
+              <div class="field"><label>4. Envergadura de brazos (cm)</label><input type="number" step="0.1" id="isak_envergadura" class="calc-trigger" /></div>
+            </div>
+
+            <h4 class="isak-sub">B. Pliegues Cutáneos ISAK Restringido (8 mediciones en mm)</h4>
+            <div class="form-grid-4">
+              <div class="field"><label>5. Pliegue Tríceps (mm)</label><input type="number" step="0.1" id="p_triceps" class="calc-trigger" /></div>
+              <div class="field"><label>6. Pliegue Subescapular (mm)</label><input type="number" step="0.1" id="p_subescapular" class="calc-trigger" /></div>
+              <div class="field"><label>7. Pliegue Bíceps (mm)</label><input type="number" step="0.1" id="p_biceps" class="calc-trigger" /></div>
+              <div class="field"><label>8. Pliegue Cresta Ilíaca (mm)</label><input type="number" step="0.1" id="p_cresta" class="calc-trigger" /></div>
+              <div class="field"><label>9. Pliegue Supraespinal (mm)</label><input type="number" step="0.1" id="p_supraespinal" class="calc-trigger" /></div>
+              <div class="field"><label>10. Pliegue Abdominal (mm)</label><input type="number" step="0.1" id="p_abdominal" class="calc-trigger" /></div>
+              <div class="field"><label>11. Pliegue Muslo frontal (mm)</label><input type="number" step="0.1" id="p_muslo" class="calc-trigger" /></div>
+              <div class="field"><label>12. Pliegue Pantorrilla media (mm)</label><input type="number" step="0.1" id="p_pantorrilla" class="calc-trigger" /></div>
+            </div>
+
+            <h4 class="isak-sub">C. Perímetros ISAK Restringido (5 mediciones en cm)</h4>
+            <div class="form-grid-4">
+              <div class="field"><label>13. Brazo relajado (cm)</label><input type="number" step="0.1" id="ant_brazo_rel" class="calc-trigger" /></div>
+              <div class="field"><label>14. Brazo flexionado/tenso (cm)</label><input type="number" step="0.1" id="ant_brazo_flex" class="calc-trigger" /></div>
+              <div class="field"><label>15. Cintura mínima (cm)</label><input type="number" step="0.1" id="per_cintura_isak" class="calc-trigger" /></div>
+              <div class="field"><label>16. Caderas / Glúteo máx (cm)</label><input type="number" step="0.1" id="per_cadera_isak" class="calc-trigger" /></div>
+              <div class="field"><label>17. Pantorrilla máxima (cm)</label><input type="number" step="0.1" id="ant_pantorrilla_per" class="calc-trigger" /></div>
+            </div>
+
+            <h4 class="isak-sub">D. Diámetros Óseos ISAK Restringido (4 mediciones en cm)</h4>
+            <div class="form-grid-4">
+              <div class="field"><label>18. Biacromial (cm)</label><input type="number" step="0.1" id="d_biacromial" class="calc-trigger" /></div>
+              <div class="field"><label>19. Biiliocrestídeo (cm)</label><input type="number" step="0.1" id="d_biiliocrestideo" class="calc-trigger" /></div>
+              <div class="field"><label>20. Húmero / Biepicondilar (cm)</label><input type="number" step="0.1" id="d_humero" class="calc-trigger" /></div>
+              <div class="field"><label>21. Fémur / Bicondilar (cm)</label><input type="number" step="0.1" id="d_femur" class="calc-trigger" /></div>
+            </div>
+          </div>
+
+          <!-- Contenedor adicional para completar las 43 mediciones del Perfil Completo ISAK -->
+          <div id="isakFullContainer" class="hidden">
+            <h4 class="isak-sub">E. Diámetros Óseos Adicionales — Perfil Completo (3 mediciones en cm)</h4>
+            <div class="form-grid-4">
+              <div class="field"><label>22. Tórax transverso (cm)</label><input type="number" step="0.1" id="d_torax_trans" class="calc-trigger" /></div>
+              <div class="field"><label>23. Tórax anteroposterior (cm)</label><input type="number" step="0.1" id="d_torax_ap" class="calc-trigger" /></div>
+              <div class="field"><label>24. Biestiloideo muñeca (cm)</label><input type="number" step="0.1" id="d_muneca_estilo" class="calc-trigger" /></div>
+            </div>
+
+            <h4 class="isak-sub">F. Perímetros Adicionales — Perfil Completo (8 mediciones en cm)</h4>
+            <div class="form-grid-4">
+              <div class="field"><label>25. Cefálico (cm)</label><input type="number" step="0.1" id="per_cefalico" class="calc-trigger" /></div>
+              <div class="field"><label>26. Cuello (cm)</label><input type="number" step="0.1" id="per_cuello" class="calc-trigger" /></div>
+              <div class="field"><label>27. Tórax mesoesternal (cm)</label><input type="number" step="0.1" id="per_torax" class="calc-trigger" /></div>
+              <div class="field"><label>28. Antebrazo máximo (cm)</label><input type="number" step="0.1" id="per_antebrazo" class="calc-trigger" /></div>
+              <div class="field"><label>29. Muñeca perímetro (cm)</label><input type="number" step="0.1" id="per_muneca" class="calc-trigger" /></div>
+              <div class="field"><label>30. Muslo superior (cm)</label><input type="number" step="0.1" id="per_muslo_sup" class="calc-trigger" /></div>
+              <div class="field"><label>31. Muslo medial (cm)</label><input type="number" step="0.1" id="ant_muslo_per" class="calc-trigger" /></div>
+              <div class="field"><label>32. Tobillo mínimo (cm)</label><input type="number" step="0.1" id="per_tobillo" class="calc-trigger" /></div>
+            </div>
+
+            <h4 class="isak-sub">G. Longitudes y Alturas de Segmentos — Perfil Completo (11 mediciones en cm)</h4>
+            <div class="form-grid-4">
+              <div class="field"><label>33. Acromiale-radiale (cm)</label><input type="number" step="0.1" id="lon_acromio_radial" class="calc-trigger" /></div>
+              <div class="field"><label>34. Radiale-stylion (cm)</label><input type="number" step="0.1" id="lon_radial_estilo" class="calc-trigger" /></div>
+              <div class="field"><label>35. Stylion-dactylion mano (cm)</label><input type="number" step="0.1" id="lon_mano" class="calc-trigger" /></div>
+              <div class="field"><label>36. Altura iliospinale (cm)</label><input type="number" step="0.1" id="alt_iliospinale" class="calc-trigger" /></div>
+              <div class="field"><label>37. Altura trocanterion (cm)</label><input type="number" step="0.1" id="alt_trocanterion" class="calc-trigger" /></div>
+              <div class="field"><label>38. Trocanterion-tibiale lat. (cm)</label><input type="number" step="0.1" id="lon_trocanter_tibial" class="calc-trigger" /></div>
+              <div class="field"><label>39. Altura tibiale laterale (cm)</label><input type="number" step="0.1" id="alt_tibial" class="calc-trigger" /></div>
+              <div class="field"><label>40. Tibiale mediale-suelo (cm)</label><input type="number" step="0.1" id="alt_tibial_medial" class="calc-trigger" /></div>
+              <div class="field"><label>41. Longitud del pie (cm)</label><input type="number" step="0.1" id="lon_pie" class="calc-trigger" /></div>
+              <div class="field"><label>42. Pliegue Antebrazo (mm)</label><input type="number" step="0.1" id="p_antebrazo" class="calc-trigger" /></div>
+              <div class="field"><label>43. Pliegue Muslo medial (mm)</label><input type="number" step="0.1" id="p_muslo_medial" class="calc-trigger" /></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Sumatorias, Masas, Agua Corporal, Fórmulas % Grasa y Somatotipo -->
+        <div class="grid-2">
+          <div class="card results-card">
+            <h3>4. Composición Corporal, Agua e Índices Derivados</h3>
+            <div class="results-grid">
+              <div class="res-box">
+                <span>Sumatoria 6 Pliegues</span>
+                <strong id="res_sum6">—</strong>
+                <small>Tríceps, Subesc., Supraesp., Abd., Muslo, Pant.</small>
+              </div>
+              <div class="res-box">
+                <span>Sumatoria 8 Pliegues</span>
+                <strong id="res_sum8">—</strong>
+                <small>Σ6 + Bíceps + Cresta ilíaca</small>
+              </div>
+              <div class="res-box">
+                <span>Masa Grasa Estimada</span>
+                <strong id="res_masa_grasa">—</strong>
+                <small id="res_grasa_prom">Prom. % grasa: —</small>
+              </div>
+              <div class="res-box">
+                <span>Masa Libre de Grasa (MLG)</span>
+                <strong id="res_mlg">—</strong>
+                <small id="res_mlg_pct">% MLG: —</small>
+              </div>
+              <div class="res-box">
+                <span>Índice de Masa Libre de Grasa</span>
+                <strong id="res_imlg">—</strong>
+                <small id="res_imlg_dx">kg / m² de MLG</small>
+              </div>
+              <div class="res-box">
+                <span>ACT (MLG / BIA)</span>
+                <strong id="res_act_litros">—</strong>
+                <small id="res_act_fuente">Litros estimados</small>
+              </div>
+              <div class="res-box">
+                <span>% Agua Corporal Estimado</span>
+                <strong id="res_act_pct">—</strong>
+                <small id="res_act_dx">Referencia: 50-65%</small>
+              </div>
+              <div class="res-box">
+                <span>ACT Watson (Adultos)</span>
+                <strong id="res_watson_litros">—</strong>
+                <small id="res_watson_pct">% ACT Watson: —</small>
+              </div>
+              <div class="res-box">
+                <span>CMB Corregida</span>
+                <strong id="res_cmb">—</strong>
+                <small>Circunferencia muscular brazo</small>
+              </div>
+            </div>
+
+            <h4 class="isak-sub" style="margin-top: 1rem;">Fórmulas de % Grasa Corporal (ISAK)</h4>
+            <div class="formulas-grid">
+              <div class="formula-box"><span>Yuhasz Carter (6 pliegues)</span><strong id="f_yuhasz">—</strong></div>
+              <div class="formula-box"><span>Durnin & Womersley (Siri)</span><strong id="f_durnin">—</strong></div>
+              <div class="formula-box"><span>Faulkner (4 pliegues)</span><strong id="f_faulkner">—</strong></div>
+              <div class="formula-box"><span>Carter (4 pliegues)</span><strong id="f_carter">—</strong></div>
+              <div class="formula-box"><span>Withers (4 pliegues)</span><strong id="f_withers">—</strong></div>
+              <div class="formula-box"><span>Jackson & Pollock (3 pliegues)</span><strong id="f_jp3">—</strong></div>
+              <div class="formula-box"><span>Sloan & Weir</span><strong id="f_sloan">—</strong></div>
+              <div class="formula-box"><span>Promedio % Grasa</span><strong id="f_promedio_dup">—</strong></div>
+            </div>
+          </div>
+
+          <div class="card results-card">
+            <h3>5. Somatotipo Antropométrico (Heath-Carter)</h3>
+            <div class="somato-grid">
+              <div class="res-box">
+                <span>Endomorfia (Adiposidad)</span>
+                <strong id="som_endo">—</strong>
+                <small>Componente 1</small>
+              </div>
+              <div class="res-box">
+                <span>Mesomorfia (Musculoesquelético)</span>
+                <strong id="som_meso">—</strong>
+                <small>Componente 2</small>
+              </div>
+              <div class="res-box">
+                <span>Ectomorfia (Linealidad)</span>
+                <strong id="som_ecto">—</strong>
+                <small>Componente 3</small>
+              </div>
+              <div class="res-box">
+                <span>Clasificación Somatotípica</span>
+                <strong id="som_clasif">—</strong>
+                <small id="som_coords">—</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== PESTAÑA C: BIOQUÍMICA ==================== -->
+      <section id="tab-bioquimica" class="tab-panel">
+        <div class="card">
+          <div class="card-header-flex">
+            <h3>Analítica de Laboratorio (Semáforo Automático)</h3>
+            <div class="field inline-field">
+              <label>Fecha de estudios:</label>
+              <input type="date" id="lab_fecha" />
+            </div>
+          </div>
+
+          <div class="lab-grid">
+            <div class="lab-item">
+              <label>Glucosa en ayuno (mg/dL)</label>
+              <input type="number" step="0.1" id="lab_glucosa" class="lab-input" data-min="70" data-max="99" />
+              <span class="status-tag" id="tag_lab_glucosa">Sin dato</span>
+            </div>
+            <div class="lab-item">
+              <label>Insulina basal (µUI/mL)</label>
+              <input type="number" step="0.1" id="lab_insulina" class="lab-input" data-min="2" data-max="15" />
+              <span class="status-tag" id="tag_lab_insulina">Sin dato</span>
+            </div>
+            <div class="lab-item">
+              <label>HbA1c (%)</label>
+              <input type="number" step="0.1" id="lab_hba1c" class="lab-input" data-min="4.0" data-max="5.6" />
+              <span class="status-tag" id="tag_lab_hba1c">Sin dato</span>
+            </div>
+            <div class="lab-item">
+              <label>Colesterol Total (mg/dL)</label>
+              <input type="number" step="1" id="lab_colesterol" class="lab-input" data-min="100" data-max="199" />
+              <span class="status-tag" id="tag_lab_colesterol">Sin dato</span>
+            </div>
+            <div class="lab-item">
+              <label>Colesterol LDL (mg/dL)</label>
+              <input type="number" step="1" id="lab_ldl" class="lab-input" data-min="0" data-max="99" />
+              <span class="status-tag" id="tag_lab_ldl">Sin dato</span>
+            </div>
+            <div class="lab-item">
+              <label>Colesterol HDL (mg/dL)</label>
+              <input type="number" step="1" id="lab_hdl" class="lab-input" data-min="45" data-max="120" />
+              <span class="status-tag" id="tag_lab_hdl">Sin dato</span>
+            </div>
+            <div class="lab-item">
+              <label>Triglicéridos (mg/dL)</label>
+              <input type="number" step="1" id="lab_trigliceridos" class="lab-input" data-min="30" data-max="149" />
+              <span class="status-tag" id="tag_lab_trigliceridos">Sin dato</span>
+            </div>
+            <div class="lab-item">
+              <label>Hemoglobina (g/dL)</label>
+              <input type="number" step="0.1" id="lab_hb" class="lab-input" data-min="12" data-max="17.5" />
+              <span class="status-tag" id="tag_lab_hb">Sin dato</span>
+            </div>
+            <div class="lab-item">
+              <label>TSH (mUI/L)</label>
+              <input type="number" step="0.01" id="lab_tsh" class="lab-input" data-min="0.4" data-max="4.0" />
+              <span class="status-tag" id="tag_lab_tsh">Sin dato</span>
+            </div>
+            <div class="lab-item">
+              <label>Vitamina D 25-OH (ng/mL)</label>
+              <input type="number" step="0.1" id="lab_vitd" class="lab-input" data-min="30" data-max="100" />
+              <span class="status-tag" id="tag_lab_vitd">Sin dato</span>
+            </div>
+            <div class="lab-item">
+              <label>Ácido Úrico (mg/dL)</label>
+              <input type="number" step="0.1" id="lab_urico" class="lab-input" data-min="2.5" data-max="6.5" />
+              <span class="status-tag" id="tag_lab_urico">Sin dato</span>
+            </div>
+            <div class="lab-item">
+              <label>Creatinina (mg/dL)</label>
+              <input type="number" step="0.01" id="lab_creatinina" class="lab-input" data-min="0.6" data-max="1.2" />
+              <span class="status-tag" id="tag_lab_creatinina">Sin dato</span>
+            </div>
+          </div>
+
+          <div class="bio-indices-bar">
+            <div>
+              <span>Índice HOMA-IR:</span>
+              <strong id="res_homa">—</strong>
+              <small id="res_homa_dx"></small>
+            </div>
+            <div>
+              <span>Índice Aterogénico (CT / HDL):</span>
+              <strong id="res_atero">—</strong>
+              <small id="res_atero_dx"></small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== PESTAÑA D: CLÍNICA ==================== -->
+      <section id="tab-clinica" class="tab-panel">
+        <div class="grid-2">
+          <div class="card">
+            <h3>Signos y Síntomas Gastrointestinales</h3>
+            <div class="checklist-grid" id="giSymptomsList">
+              <label><input type="checkbox" value="Reflujo / Pirosis" /> Reflujo / Pirosis</label>
+              <label><input type="checkbox" value="Gastritis / Dolor epigástrico" /> Gastritis / Dolor</label>
+              <label><input type="checkbox" value="Distensión abdominal" /> Distensión abdominal</label>
+              <label><input type="checkbox" value="Gases / Flatulencia" /> Gases excesivos</label>
+              <label><input type="checkbox" value="Estreñimiento" /> Estreñimiento</label>
+              <label><input type="checkbox" value="Diarrea frecuente" /> Diarrea frecuente</label>
+              <label><input type="checkbox" value="Náuseas / Saciedad precoz" /> Saciedad precoz</label>
+              <label><input type="checkbox" value="Disfagia" /> Dificultad al tragar</label>
+            </div>
+
+            <h3 style="margin-top: 1.5rem;">Exploración Física (Signos Carenciales)</h3>
+            <div class="checklist-grid" id="physicalSignsList">
+              <label><input type="checkbox" value="Caída de cabello / quebradizo" /> Cabello quebradizo</label>
+              <label><input type="checkbox" value="Uñas estriadas o coiloniquia" /> Uñas frágiles</label>
+              <label><input type="checkbox" value="Piel seca / hiperqueratosis" /> Resequedad en piel</label>
+              <label><input type="checkbox" value="Palidez conjuntival" /> Palidez mucosa</label>
+              <label><input type="checkbox" value="Acantosis nigricans" /> Acantosis nigricans</label>
+              <label><input type="checkbox" value="Edema en miembros inferiores" /> Edema periférico</label>
+              <label><input type="checkbox" value="Fatiga / astenia crónica" /> Fatiga crónica</label>
+              <label><input type="checkbox" value="Calambres musculares" /> Calambres frecuentes</label>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Notas Clínicas, Alergias y Medicación Actual</h3>
+            <div class="field">
+              <label>Patologías diagnosticadas y cirugías previas</label>
+              <textarea id="cli_patologias" rows="3" placeholder="Ej. Resistencia a la insulina, hipotiroidismo controlado, colecistectomía..."></textarea>
+            </div>
+            <div class="field">
+              <label>Antecedentes Heredofamiliares (DM2, HTA, Dislipidemias, Cáncer)</label>
+              <textarea id="cli_heredo" rows="2" placeholder="Ej. Madre con DM2, padre con hipertensión..."></textarea>
+            </div>
+            <div class="field">
+              <label>Alergias o Intolerancias Alimentarias</label>
+              <input type="text" id="cli_alergias" placeholder="Ej. Intolerancia a la lactosa, alergia a nueces..." />
+            </div>
+
+            <div class="card-header-flex" style="margin-top: 1.2rem;">
+              <h3>Fármacos y Suplementos</h3>
+              <button type="button" id="btnAddMed" class="btn btn-sm btn-outline">+ Agregar</button>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Dosis / Horario</th>
+                  <th>Interacción / Nota</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="medsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top: 1.25rem;">
+          <div class="card">
+            <h3>Escala de Bristol (Consistencia de Heces)</h3>
+            <div class="scale-options" id="bristolScaleGroup">
+              <label class="scale-card"><input type="radio" name="cli_bristol" value="Tipo 1 — Trozos duros separados (estreñimiento severo)" /><div><strong>Tipo 1</strong><small>Trozos duros separados (como nueces), difíciles de evacuar.</small></div></label>
+              <label class="scale-card"><input type="radio" name="cli_bristol" value="Tipo 2 — Forma de salchicha pero grumosa" /><div><strong>Tipo 2</strong><small>Forma de salchicha pero compuesta por fragmentos/grumos.</small></div></label>
+              <label class="scale-card"><input type="radio" name="cli_bristol" value="Tipo 3 — Forma de salchicha con grietas en superficie" /><div><strong>Tipo 3</strong><small>Como una salchicha pero con grietas en su superficie.</small></div></label>
+              <label class="scale-card"><input type="radio" name="cli_bristol" value="Tipo 4 — Lisa y blanda (patrón ideal)" /><div><strong>Tipo 4</strong><small>Lisa y blanda, como salchicha o serpiente (patrón ideal).</small></div></label>
+              <label class="scale-card"><input type="radio" name="cli_bristol" value="Tipo 5 — Bolas blandas con bordes definidos" /><div><strong>Tipo 5</strong><small>Bolas blandas con bordes definidos (fácil evacuación).</small></div></label>
+              <label class="scale-card"><input type="radio" name="cli_bristol" value="Tipo 6 — Fragmentos blandos y pastosos" /><div><strong>Tipo 6</strong><small>Fragmentos blandos y esponjosos con bordes irregulares.</small></div></label>
+              <label class="scale-card"><input type="radio" name="cli_bristol" value="Tipo 7 — Acuosa sin trozos sólidos (diarrea)" /><div><strong>Tipo 7</strong><small>Totalmente líquida / acuosa sin trozos sólidos.</small></div></label>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Escala de Armstrong (Grado de Edema)</h3>
+            <div class="scale-options" id="armstrongScaleGroup">
+              <label class="scale-card"><input type="radio" name="cli_armstrong" value="Grado 0 — Sin edema apreciable" /><div><strong>Grado 0</strong><small>Sin edema; la piel vuelve a su estado normal sin depresión.</small></div></label>
+              <label class="scale-card"><input type="radio" name="cli_armstrong" value="Grado 1 — Depresión leve (<2 mm), desaparición rápida" /><div><strong>Grado 1</strong><small>Depresión leve (&lt;2 mm), sin distorsión visible, desaparece rápido.</small></div></label>
+              <label class="scale-card"><input type="radio" name="cli_armstrong" value="Grado 2 — Depresión moderada (2-4 mm), tarda ~10-15 s" /><div><strong>Grado 2</strong><small>Depresión moderada (2-4 mm), tarda aprox. 10-15 segundos en borrar.</small></div></label>
+              <label class="scale-card"><input type="radio" name="cli_armstrong" value="Grado 3 — Depresión profunda (4-6 mm), tarda >1 min" /><div><strong>Grado 3</strong><small>Depresión profunda (4-6 mm), tarda más de 1 minuto; extremidad inflamada.</small></div></label>
+            </div>
+            <div class="field" style="margin-top: 0.9rem;">
+              <label>Localización / Observaciones de edema (Armstrong)</label>
+              <input type="text" id="cli_armstrong_nota" placeholder="Ej. Maleolar bilateral vespertino, sin fóvea..." />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== PESTAÑA E: DIETÉTICA ==================== -->
+      <section id="tab-dietetica" class="tab-panel">
+        <div class="card">
+          <h3>1. Frecuencia de Consumo de Alimentos (Semanal)</h3>
+          <div class="table-responsive">
+            <table class="data-table freq-table">
+              <thead>
+                <tr>
+                  <th>Grupo de Alimentos</th>
+                  <th>Diario</th>
+                  <th>4-6 veces/sem</th>
+                  <th>1-3 veces/sem</th>
+                  <th>Ocasional</th>
+                  <th>Nunca</th>
+                </tr>
+              </thead>
+              <tbody id="freqTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 1.25rem;">
+          <div class="card-header-flex">
+            <h3>2. Recordatorio de 24 Horas (R24H)</h3>
+            <button type="button" id="btnAddR24" class="btn btn-sm btn-outline">+ Agregar Tiempo de Comida</button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Tiempo de Comida</th>
+                  <th>Hora</th>
+                  <th>Alimentos y Preparaciones</th>
+                  <th>Cantidad / Porciones</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="r24TableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== PESTAÑA F: ESTILOS DE VIDA ==================== -->
+      <section id="tab-estilo" class="tab-panel">
+        <div class="grid-3">
+          <div class="card">
+            <h3>1. Higiene del Sueño</h3>
+            <div class="field"><label>Hora habitual de dormir</label><input type="time" id="est_dormir" class="sleep-trigger" /></div>
+            <div class="field"><label>Hora habitual de despertar</label><input type="time" id="est_despertar" class="sleep-trigger" /></div>
+            <div class="res-box" style="margin: 0.75rem 0;">
+              <span>Duración estimada de sueño</span>
+              <strong id="res_sueno_horas">—</strong>
+              <small id="res_sueno_dx">—</small>
+            </div>
+            <div class="field"><label>Calidad percibida (1 al 10)</label><input type="number" min="1" max="10" id="est_sueno_calidad" /></div>
+          </div>
+
+          <div class="card">
+            <h3>2. Actividad Física y Ejercicio</h3>
+            <div class="field">
+              <label>Nivel de Actividad Diaria (FAF)</label>
+              <select id="est_faf" class="calc-trigger">
+                <option value="1.2">1.20 — Sedentario (trabajo de oficina, sin ejercicio)</option>
+                <option value="1.375">1.375 — Ligera (ejercicio 1-3 días/sem)</option>
+                <option value="1.55">1.55 — Moderada (ejercicio 3-5 días/sem)</option>
+                <option value="1.725">1.725 — Intensa (entrenamiento 6-7 días/sem)</option>
+                <option value="1.9">1.90 — Muy intensa (doble sesión / atleta)</option>
+              </select>
+            </div>
+            <div class="field"><label>Disciplina / Tipo de entrenamiento</label><input type="text" id="est_ejercicio_tipo" placeholder="Ej. Pesas + Caminata 8,000 pasos" /></div>
+            <div class="form-grid-2">
+              <div class="field"><label>Días / semana</label><input type="number" min="0" max="7" id="est_ejercicio_dias" /></div>
+              <div class="field"><label>Minutos / sesión</label><input type="number" min="0" max="300" id="est_ejercicio_min" /></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>3. Hidratación y Consumo de Sustancias</h3>
+            <div class="field"><label>Agua natural al día (Litros)</label><input type="number" step="0.1" id="est_agua" /></div>
+            <div class="field">
+              <label>Consumo de Alcohol</label>
+              <select id="est_alcohol">
+                <option value="Nulo">Nulo / No consume</option>
+                <option value="Ocasional social">Ocasional (1-2 copas/mes)</option>
+                <option value="Fines de semana">Fines de semana (3-5 bebidas)</option>
+                <option value="Frecuente">Frecuente (+3 veces/semana)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Tabaco / Vapeo</label>
+              <select id="est_tabaco">
+                <option value="No">No fuma / No vapea</option>
+                <option value="Ocasional">Ocasional</option>
+                <option value="Diario">Consumo diario</option>
+              </select>
+            </div>
+            <div class="field"><label>Cafeína / Bebidas energéticas</label><input type="text" id="est_cafeina" placeholder="Ej. 2 tazas de café americano por la mañana" /></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal Reporte y JSON para Supabase -->
+  <div id="reportModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Síntesis de Evaluación Nutricional</h2>
+        <button id="btnCloseModal" class="btn-close">&times;</button>
+      </div>
+      <div id="reportSummaryBody" class="report-body"></div>
+      <details class="json-details">
+        <summary>Ver Payload JSON (Listo para guardar en Supabase)</summary>
+        <pre id="jsonOutput"></pre>
+      </details>
+      <div class="modal-footer">
+        <button id="btnPrintReport" class="btn btn-outline">Imprimir / Guardar PDF</button>
+        <button id="btnConfirmSave" class="btn btn-primary">Confirmar en Memoria Local</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Nuevo Paciente -->
+  <div id="newPatientModal" class="modal hidden">
+    <div class="modal-content modal-sm">
+      <div class="modal-header">
+        <h2>Registrar Nuevo Paciente</h2>
+        <button id="btnCloseNewPatient" class="btn-close">&times;</button>
+      </div>
+      <form id="newPatientForm">
+        <div class="field">
+          <label>Nombre completo</label>
+          <input type="text" id="np_nombre" required placeholder="Ej. Mariana López Torres" />
+        </div>
+        <div class="form-grid-2">
+          <div class="field">
+            <label>Edad (años)</label>
+            <input type="number" id="np_edad" required min="0" max="110" value="28" />
+          </div>
+          <div class="field">
+            <label>Sexo biológico</label>
+            <select id="np_sexo">
+              <option value="F">Femenino</option>
+              <option value="M">Masculino</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="guardianSection" class="guardian-box hidden">
+          <div class="guardian-title">Responsable / Tutor Legal (Menor de edad)</div>
+          <div class="field">
+            <label>Nombre del padre, madre o tutor</label>
+            <input type="text" id="np_tutor_nombre" placeholder="Ej. Laura Torres Méndez" />
+          </div>
+          <div class="form-grid-2">
+            <div class="field">
+              <label>Parentesco</label>
+              <select id="np_tutor_parentesco">
+                <option value="">Seleccionar...</option>
+                <option value="Madre">Madre</option>
+                <option value="Padre">Padre</option>
+                <option value="Tutor legal">Tutor legal</option>
+                <option value="Abuelo(a)">Abuelo(a)</option>
+                <option value="Otro familiar">Otro familiar</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Teléfono de contacto</label>
+              <input type="tel" id="np_tutor_telefono" placeholder="Ej. 644 123 4567" />
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Motivo de consulta</label>
+          <input type="text" id="np_objetivo" required placeholder="Ej. Pérdida de grasa y mejora digestiva" />
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Crear Expediente</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/calculations.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

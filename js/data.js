@@ -20,6 +20,25 @@ const FREQ_OPTIONS = [
   "Nunca"
 ];
 
+function createEmptyAhfStruct(notas = "") {
+  return {
+    trigliceridemia: { marcado: false, detalle: "", familiar: "" },
+    hipercolesterolemia: { marcado: false, detalle: "", familiar: "" },
+    diabetesTipo1: { marcado: false, detalle: "", familiar: "" },
+    diabetesTipo2: { marcado: false, detalle: "", familiar: "" },
+    hipertensionArterial: { marcado: false, detalle: "", familiar: "" },
+    cancer: { marcado: false, detalle: "", familiar: "" },
+    enfermedadCardiovascular: { marcado: false, detalle: "", familiar: "" },
+    enfermedadAutoinmune: { marcado: false, detalle: "", familiar: "" },
+    enfermedadRenal: { marcado: false, detalle: "", familiar: "" },
+    enfermedadMental: { marcado: false, detalle: "", familiar: "" },
+    enfermedadNeurologica: { marcado: false, detalle: "", familiar: "" },
+    enfermedadTiroidea: { marcado: false, detalle: "", familiar: "" },
+    otras: { marcado: false, detalle: "", familiar: "" },
+    notas
+  };
+}
+
 let PATIENTS_DB = [
   {
     id: "pac-001",
@@ -34,11 +53,42 @@ let PATIENTS_DB = [
       correo: "anasofia.mendoza@ejemplo.com",
       ocupacion: "Diseñadora gráfica / Freelance",
       estadoCivil: "Soltera",
+      etnia: "Mestiza",
+      religion: "Católica",
+      escolaridad: "Licenciatura / Ingeniería",
+      seguridadSocial: "IMSS",
+      nivelSocioeconomico: "Medio",
       domicilio: "Col. Centro, Ciudad Obregón, Son.",
       contactoEmergencia: "Patricia Mendoza (Madre) - 644 190 4421",
+      personales: {
+        enfermedadesDiagnosticadas: "Sensibilidad gastrointestinal funcional / distensión abdominal",
+        enfermedadesAnteriores: "Gastritis aguda (2022), varicela en infancia",
+        pesoFormaCorporal: "Ninguno actualmente; usó té verde/quemador sin cafeína hace 2 años",
+        cirugiasPrevias: "Apendicectomía (2013)",
+        hospitalizaciones: "Hospitalización breve por apendicectomía (2013)",
+        alergiasAlimentarias: "Ninguna diagnosticada",
+        intoleranciasAlimentarias: "Lactosa en grandes cantidades",
+        tratamientoMedicoActual: "Ningún fármaco prescrito actualmente",
+        suplementosActuales: "Vitamina D3 (2000 UI/día), probiótico",
+        interaccionFarmacoNutrimento: "Sin interacciones farmacológicas activas"
+      },
       patologicosPersonales: "Sin enfermedades crónicas diagnosticadas. Cirugía de apendicectomía a los 16 años.",
       noPatologicosPersonales: "Horario laboral mixto, exposición moderada a pantallas, esquema de vacunación completo.",
-      heredofamiliares: "Madre con hipotiroidismo; abuelo materno con DM2; padre aparentemente sano."
+      heredofamiliares: "Madre con hipotiroidismo; abuelo materno con DM2; padre aparentemente sano.",
+      ahf: {
+        ...createEmptyAhfStruct("Madre con hipotiroidismo; abuelo materno con DM2."),
+        diabetesTipo2: { marcado: true, detalle: "", familiar: "Abuelo materno" },
+        enfermedadTiroidea: { marcado: true, detalle: "Hipotiroidismo", familiar: "Madre" }
+      },
+      ginecologicos: {
+        menarquia: 12,
+        regularidad: "Regular (21-35 días)",
+        dolor: "Moderado",
+        embarazos: 0,
+        abortos: 0,
+        enfermedades: "Ninguna diagnosticada",
+        anticonceptivos: "Ninguno"
+      }
     },
     antropometria: {
       isakMode: "restricted",
@@ -192,11 +242,43 @@ let PATIENTS_DB = [
       correo: "carlos.ruiz@ejemplo.com",
       ocupacion: "Supervisor de logística",
       estadoCivil: "Casado",
+      etnia: "Mestiza",
+      religion: "Católica",
+      escolaridad: "Preparatoria / Bachillerato",
+      seguridadSocial: "IMSS",
+      nivelSocioeconomico: "Medio",
       domicilio: "Fracc. Las Fuentes, Ciudad Obregón, Son.",
       contactoEmergencia: "Valeria Ruiz (Esposa) - 644 455 9099",
+      personales: {
+        enfermedadesDiagnosticadas: "Prediabetes y dislipidemia mixta",
+        enfermedadesAnteriores: "Sin enfermedades graves previas",
+        pesoFormaCorporal: "Ninguno",
+        cirugiasPrevias: "Ninguna",
+        hospitalizaciones: "Ninguna",
+        alergiasAlimentarias: "Ninguna conocida",
+        intoleranciasAlimentarias: "Refiere malestar con comidas muy grasosas de noche",
+        tratamientoMedicoActual: "Metformina 850 mg con la cena",
+        suplementosActuales: "Ninguno",
+        interaccionFarmacoNutrimento: "Metformina: vigilar niveles/absorción de Vitamina B12 y tomar con alimentos"
+      },
       patologicosPersonales: "Prediabetes y dislipidemia mixta de reciente diagnóstico.",
       noPatologicosPersonales: "Jornada extensa con comidas frecuentes fuera de casa.",
-      heredofamiliares: "Padre con DM2 e hipertensión arterial; madre con dislipidemia."
+      heredofamiliares: "Padre con DM2 e hipertensión arterial; madre con dislipidemia.",
+      ahf: {
+        ...createEmptyAhfStruct("Padre con DM2 e hipertensión arterial; madre con hipercolesterolemia."),
+        hipercolesterolemia: { marcado: true, detalle: "", familiar: "Madre" },
+        diabetesTipo2: { marcado: true, detalle: "", familiar: "Padre" },
+        hipertensionArterial: { marcado: true, detalle: "", familiar: "Padre" }
+      },
+      ginecologicos: {
+        menarquia: null,
+        regularidad: "",
+        dolor: "",
+        embarazos: null,
+        abortos: null,
+        enfermedades: "",
+        anticonceptivos: ""
+      }
     },
     antropometria: {
       isakMode: "restricted",
@@ -353,11 +435,41 @@ let PATIENTS_DB = [
       correo: "fernanda.ortega@ejemplo.com",
       ocupacion: "Preescolar / Estancia infantil",
       estadoCivil: "Soltero(a)",
+      etnia: "Mestiza",
+      religion: "No aplica / Sin registro",
+      escolaridad: "Preescolar",
+      seguridadSocial: "IMSS",
+      nivelSocioeconomico: "Medio",
       domicilio: "Col. Villa California, Ciudad Obregón, Son.",
       contactoEmergencia: "Fernanda Ortega Robles (Madre) - 644 312 7780",
+      personales: {
+        enfermedadesDiagnosticadas: "Ninguna",
+        enfermedadesAnteriores: "Resfriados comunes estacionales sin complicaciones",
+        pesoFormaCorporal: "No aplica",
+        cirugiasPrevias: "Ninguna",
+        hospitalizaciones: "Ninguna",
+        alergiasAlimentarias: "Ninguna conocida",
+        intoleranciasAlimentarias: "Ninguna conocida",
+        tratamientoMedicoActual: "Ninguno",
+        suplementosActuales: "Ninguno",
+        interaccionFarmacoNutrimento: "No aplica"
+      },
       patologicosPersonales: "Nacido a término (39 SDG), peso al nacer 3.25 kg. Sin alergias ni hospitalizaciones.",
       noPatologicosPersonales: "Cartilla de vacunación completa al corriente.",
-      heredofamiliares: "Abuelo paterno con hipertensión; padres aparentemente sanos."
+      heredofamiliares: "Abuelo paterno con hipertensión; padres aparentemente sanos.",
+      ahf: {
+        ...createEmptyAhfStruct("Abuelo paterno con hipertensión arterial."),
+        hipertensionArterial: { marcado: true, detalle: "", familiar: "Abuelo paterno" }
+      },
+      ginecologicos: {
+        menarquia: null,
+        regularidad: "",
+        dolor: "",
+        embarazos: null,
+        abortos: null,
+        enfermedades: "",
+        anticonceptivos: ""
+      }
     },
     antropometria: {
       isakMode: "restricted",

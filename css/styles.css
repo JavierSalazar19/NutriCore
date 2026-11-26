@@ -596,3 +596,143 @@ input:focus, select:focus, textarea:focus {
   .grid-2 { grid-template-columns: 1fr; }
   .form-grid-4, .formulas-grid { grid-template-columns: 1fr 1fr; }
 }
+
+/* ===== ACOMODO RESPONSIVO DE ANTECEDENTES HEREDOFAMILIARES ===== */
+.ahf-card {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.ahf-header {
+  margin-bottom: 0.85rem;
+}
+
+.ahf-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted, #64748b);
+  margin-top: 0.25rem;
+}
+
+.ahf-col-headers {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.15fr) minmax(210px, 1.15fr) minmax(190px, 1fr);
+  gap: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  margin-bottom: 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted, #64748b);
+  background: rgba(13, 148, 136, 0.08);
+  border-radius: 8px;
+}
+
+.ahf-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.ahf-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.15fr) minmax(210px, 1.15fr) minmax(190px, 1fr);
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  background: var(--card-bg, #ffffff);
+  box-sizing: border-box;
+}
+
+.ahf-row > * {
+  min-width: 0;
+}
+
+.ahf-check-label {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 0.55rem !important;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin: 0 !important;
+  width: 100%;
+  cursor: pointer;
+}
+
+.ahf-check-label input[type="checkbox"] {
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  max-width: 16px !important;
+  flex: 0 0 16px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: inline-block !important;
+  cursor: pointer;
+}
+
+.ahf-check-label span {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ahf-tag-muted {
+  font-size: 0.82rem;
+  color: var(--text-muted, #64748b);
+  padding: 0.45rem 0.65rem;
+  border-radius: 8px;
+  background: rgba(148, 163, 184, 0.12);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ahf-row input[type="text"] {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+  .ahf-col-headers {
+    display: none;
+  }
+
+  .ahf-row {
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+  }
+
+  .ahf-check-label {
+    grid-column: 1 / -1;
+  }
+
+  .ahf-check-label span {
+    white-space: normal;
+  }
+
+  .ahf-tag-muted {
+    display: flex;
+    align-items: center;
+  }
+}
+
+@media (max-width: 580px) {
+  .ahf-row {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    padding: 0.65rem;
+  }
+
+  .ahf-tag-muted {
+    white-space: normal;
+  }
+}

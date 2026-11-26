@@ -1,6 +1,22 @@
 let currentPatientId = PATIENTS_DB[0].id;
 let activeIsakMode = "restricted"; // 'restricted' (21) | 'full' (43)
 
+const AHF_ITEMS = [
+  { key: "trigliceridemia", label: "Trigliceridemia", chkId: "ahf_chk_trigliceridemia", detId: null, famId: "ahf_fam_trigliceridemia" },
+  { key: "hipercolesterolemia", label: "Hipercolesterolemia", chkId: "ahf_chk_hipercolesterolemia", detId: null, famId: "ahf_fam_hipercolesterolemia" },
+  { key: "diabetesTipo1", label: "Diabetes tipo 1", chkId: "ahf_chk_dm1", detId: null, famId: "ahf_fam_dm1" },
+  { key: "diabetesTipo2", label: "Diabetes tipo 2", chkId: "ahf_chk_dm2", detId: null, famId: "ahf_fam_dm2" },
+  { key: "hipertensionArterial", label: "Hipertensión arterial", chkId: "ahf_chk_hta", detId: null, famId: "ahf_fam_hta" },
+  { key: "cancer", label: "Cáncer", chkId: "ahf_chk_cancer", detId: "ahf_det_cancer", famId: "ahf_fam_cancer" },
+  { key: "enfermedadCardiovascular", label: "Enfermedad cardiovascular", chkId: "ahf_chk_cv", detId: "ahf_det_cv", famId: "ahf_fam_cv" },
+  { key: "enfermedadAutoinmune", label: "Enfermedad autoinmune", chkId: "ahf_chk_autoinmune", detId: "ahf_det_autoinmune", famId: "ahf_fam_autoinmune" },
+  { key: "enfermedadRenal", label: "Enfermedad renal", chkId: "ahf_chk_renal", detId: "ahf_det_renal", famId: "ahf_fam_renal" },
+  { key: "enfermedadMental", label: "Enfermedad mental", chkId: "ahf_chk_mental", detId: "ahf_det_mental", famId: "ahf_fam_mental" },
+  { key: "enfermedadNeurologica", label: "Enfermedad neurológica", chkId: "ahf_chk_neuro", detId: "ahf_det_neuro", famId: "ahf_fam_neuro" },
+  { key: "enfermedadTiroidea", label: "Enfermedad tiroidea", chkId: "ahf_chk_tiroidea", detId: "ahf_det_tiroidea", famId: "ahf_fam_tiroidea" },
+  { key: "otras", label: "Otras", chkId: "ahf_chk_otras", detId: "ahf_det_otras", famId: "ahf_fam_otras" }
+];
+
 document.addEventListener("DOMContentLoaded", () => {
   initTabs();
   initIsakSwitch();
@@ -10,6 +26,12 @@ document.addEventListener("DOMContentLoaded", () => {
   bindEvents();
   registerServiceWorker();
   initInstallPrompt();
+});
+
+window.addEventListener("load", () => {
+  if (currentPatientId) {
+    runAllLiveCalculations();
+  }
 });
 
 // 1. Navegación por pestañas (A a F)
@@ -107,6 +129,9 @@ function loadPatientIntoForm(patientId) {
 
   // A. Antecedentes
   const antInfo = p.antecedentes || {};
+  const per = antInfo.personales || {};
+  const ahf = antInfo.ahf || {};
+  const gine = antInfo.ginecologicos || {};
   setVal("ant_nombre", p.nombre);
   setVal("ant_fecha_nac", antInfo.fechaNacimiento);
   setVal("ant_edad", p.edad);
@@ -115,12 +140,43 @@ function loadPatientIntoForm(patientId) {
   setVal("ant_correo", antInfo.correo);
   setVal("ant_ocupacion", antInfo.ocupacion);
   setVal("ant_estado_civil", antInfo.estadoCivil);
+  setVal("ant_etnia", antInfo.etnia);
+  setVal("ant_religion", antInfo.religion);
+  setVal("ant_escolaridad", antInfo.escolaridad);
+  setVal("ant_seguridad_social", antInfo.seguridadSocial);
+  setVal("ant_nse", antInfo.nivelSocioeconomico);
   setVal("ant_domicilio", antInfo.domicilio);
   setVal("ant_emergencia", antInfo.contactoEmergencia);
   setVal("ant_objetivo", p.objetivo);
+  setVal("ant_per_enfermedades_diag", per.enfermedadesDiagnosticadas);
+  setVal("ant_per_enfermedades_previas", per.enfermedadesAnteriores);
+  setVal("ant_per_peso_forma", per.pesoFormaCorporal);
+  setVal("ant_per_cirugias", per.cirugiasPrevias);
+  setVal("ant_per_hospitalizaciones", per.hospitalizaciones);
+  setVal("ant_per_alergias_alim", per.alergiasAlimentarias);
+  setVal("ant_per_intolerancias_alim", per.intoleranciasAlimentarias);
+  setVal("ant_per_tratamiento_actual", per.tratamientoMedicoActual);
+  setVal("ant_per_suplementos_actuales", per.suplementosActuales);
+  setVal("ant_per_interaccion_fn", per.interaccionFarmacoNutrimento);
   setVal("ant_patologicos", antInfo.patologicosPersonales);
   setVal("ant_no_patologicos", antInfo.noPatologicosPersonales);
-  setVal("ant_heredofamiliares", antInfo.heredofamiliares);
+
+  AHF_ITEMS.forEach(item => {
+    const entry = ahf[item.key] || {};
+    const chkEl = document.getElementById(item.chkId);
+    if (chkEl) chkEl.checked = Boolean(entry.marcado);
+    if (item.detId) setVal(item.detId, entry.detalle);
+    if (item.famId) setVal(item.famId, entry.familiar);
+  });
+  setVal("ant_heredofamiliares", ahf.notas ?? antInfo.heredofamiliares);
+
+  setVal("ant_gine_menarquia", gine.menarquia);
+  setVal("ant_gine_regularidad", gine.regularidad);
+  setVal("ant_gine_dolor", gine.dolor);
+  setVal("ant_gine_embarazos", gine.embarazos);
+  setVal("ant_gine_abortos", gine.abortos);
+  setVal("ant_gine_enfermedades", gine.enfermedades);
+  setVal("ant_gine_anticonceptivos", gine.anticonceptivos);
 
   // B. Antropometría (ISAK 21/43 + BIA + Pediátrica OMS)
   const a = p.antropometria || { pliegues: {}, bia: {}, diametros: {}, perimetrosExtra: {}, longitudesExtra: {}, pediatrico: {} };
@@ -274,9 +330,48 @@ function getVal(id) {
   return el ? el.value : "";
 }
 
+function getChecked(id) {
+  const el = document.getElementById(id);
+  return el ? Boolean(el.checked) : false;
+}
+
 function getCheckedRadioValue(name) {
   const checked = document.querySelector(`input[name="${name}"]:checked`);
   return checked ? checked.value : null;
+}
+
+function collectAhfFromUI() {
+  const ahf = {
+    notas: getVal("ant_heredofamiliares").trim()
+  };
+
+  AHF_ITEMS.forEach(item => {
+    ahf[item.key] = {
+      marcado: getChecked(item.chkId),
+      detalle: item.detId ? getVal(item.detId).trim() : "",
+      familiar: item.famId ? getVal(item.famId).trim() : ""
+    };
+  });
+
+  return ahf;
+}
+
+function formatAhfSummary(ahf) {
+  if (!ahf) return "Sin registro";
+  const parts = [];
+
+  AHF_ITEMS.forEach(item => {
+    const entry = ahf[item.key];
+    if (entry && (entry.marcado || entry.detalle || entry.familiar)) {
+      let text = item.label;
+      if (entry.detalle) text += ` (${entry.detalle})`;
+      if (entry.familiar) text += ` — Familiar: ${entry.familiar}`;
+      parts.push(text);
+    }
+  });
+
+  if (ahf.notas) parts.push(`Notas: ${ahf.notas}`);
+  return parts.length ? parts.join(" | ") : "Sin antecedentes heredofamiliares marcados";
 }
 
 function toggleGuardianFields() {
@@ -307,6 +402,8 @@ function toggleGuardianFields() {
 // 6. Cálculos en tiempo real
 function runAllLiveCalculations() {
   const p = PATIENTS_DB.find(item => item.id === currentPatientId);
+  if (!p) return;
+
   const sexoActivo = getVal("ant_sexo") || p.sexo || "F";
   const edadActiva = parseInt(getVal("ant_edad"), 10);
   const edadFinal = !isNaN(edadActiva) ? edadActiva : (p.edad || 30);
@@ -570,17 +667,48 @@ function buildFullEvaluationPayload() {
   const sexo = getVal("ant_sexo") || p.sexo;
   const objetivo = getVal("ant_objetivo").trim() || p.objetivo;
 
+  const personales = {
+    enfermedadesDiagnosticadas: getVal("ant_per_enfermedades_diag").trim(),
+    enfermedadesAnteriores: getVal("ant_per_enfermedades_previas").trim(),
+    pesoFormaCorporal: getVal("ant_per_peso_forma").trim(),
+    cirugiasPrevias: getVal("ant_per_cirugias").trim(),
+    hospitalizaciones: getVal("ant_per_hospitalizaciones").trim(),
+    alergiasAlimentarias: getVal("ant_per_alergias_alim").trim(),
+    intoleranciasAlimentarias: getVal("ant_per_intolerancias_alim").trim(),
+    tratamientoMedicoActual: getVal("ant_per_tratamiento_actual").trim(),
+    suplementosActuales: getVal("ant_per_suplementos_actuales").trim(),
+    interaccionFarmacoNutrimento: getVal("ant_per_interaccion_fn").trim()
+  };
+
+  const ahf = collectAhfFromUI();
+
   const antecedentes = {
     fechaNacimiento: getVal("ant_fecha_nac"),
     telefono: getVal("ant_telefono").trim(),
     correo: getVal("ant_correo").trim(),
     ocupacion: getVal("ant_ocupacion").trim(),
     estadoCivil: getVal("ant_estado_civil"),
+    etnia: getVal("ant_etnia").trim(),
+    religion: getVal("ant_religion").trim(),
+    escolaridad: getVal("ant_escolaridad"),
+    seguridadSocial: getVal("ant_seguridad_social"),
+    nivelSocioeconomico: getVal("ant_nse"),
     domicilio: getVal("ant_domicilio").trim(),
     contactoEmergencia: getVal("ant_emergencia").trim(),
+    personales,
     patologicosPersonales: getVal("ant_patologicos").trim(),
     noPatologicosPersonales: getVal("ant_no_patologicos").trim(),
-    heredofamiliares: getVal("ant_heredofamiliares").trim()
+    ahf,
+    heredofamiliares: formatAhfSummary(ahf),
+    ginecologicos: {
+      menarquia: getVal("ant_gine_menarquia") !== "" ? parseFloat(getVal("ant_gine_menarquia")) : null,
+      regularidad: getVal("ant_gine_regularidad"),
+      dolor: getVal("ant_gine_dolor"),
+      embarazos: getVal("ant_gine_embarazos") !== "" ? parseInt(getVal("ant_gine_embarazos"), 10) : null,
+      abortos: getVal("ant_gine_abortos") !== "" ? parseInt(getVal("ant_gine_abortos"), 10) : null,
+      enfermedades: getVal("ant_gine_enfermedades").trim(),
+      anticonceptivos: getVal("ant_gine_anticonceptivos").trim()
+    }
   };
 
   const ant = collectAntropometriaFromUI();
@@ -724,6 +852,17 @@ function bindEvents() {
       ? `<br/><strong>Tutor responsable:</strong> ${payload.tutor.nombre} (${payload.tutor.parentesco}) — Tel: ${payload.tutor.telefono}`
       : "";
 
+    const socioLine = `<br/><strong>Datos sociodemográficos:</strong> Etnia: ${payload.antecedentes.etnia || "—"} | Religión: ${payload.antecedentes.religion || "—"} | Escolaridad: ${payload.antecedentes.escolaridad || "—"} | Seguridad social: ${payload.antecedentes.seguridadSocial || "—"} | NSE percibido: ${payload.antecedentes.nivelSocioeconomico || "—"}`;
+
+    const per = payload.antecedentes.personales || {};
+    const personalLine = `<br/><strong>Antecedentes personales:</strong> Enf. diag.: ${per.enfermedadesDiagnosticadas || "—"} | Enf. previas: ${per.enfermedadesAnteriores || "—"} | Cirugías: ${per.cirugiasPrevias || "—"} | Hospitalizaciones: ${per.hospitalizaciones || "—"} | Alergias alim.: ${per.alergiasAlimentarias || "—"} | Intolerancias alim.: ${per.intoleranciasAlimentarias || "—"} | Tratamiento actual: ${per.tratamientoMedicoActual || "—"} | Suplementos actuales: ${per.suplementosActuales || "—"} | Peso/forma corporal: ${per.pesoFormaCorporal || "—"} | Interacción F-N: ${per.interaccionFarmacoNutrimento || "—"} | Patológicos: ${payload.antecedentes.patologicosPersonales || "—"} | No patológicos: ${payload.antecedentes.noPatologicosPersonales || "—"}`;
+
+    const g = payload.antecedentes.ginecologicos || {};
+    const hasGineData = g.menarquia !== null || g.regularidad || g.dolor || g.embarazos !== null || g.abortos !== null || g.enfermedades || g.anticonceptivos;
+    const gineLine = hasGineData
+      ? `<br/><strong>Antecedentes ginecológicos:</strong> Menarquia: ${g.menarquia ?? "—"} años | Ciclo: ${g.regularidad || "—"} | Dolor: ${g.dolor || "—"} | Embarazos: ${g.embarazos ?? "—"} | Abortos: ${g.abortos ?? "—"} | Anticonceptivos: ${g.anticonceptivos || "—"} | Enfermedades: ${g.enfermedades || "—"}`
+      : "";
+
     const armstrongTexto = payload.clinica.armstrong
       ? `${payload.clinica.armstrong}${payload.clinica.armstrongNota ? ` (${payload.clinica.armstrongNota})` : ""}`
       : "No evaluada";
@@ -745,7 +884,7 @@ function bindEvents() {
 
     const summaryHTML = `
       <div class="report-block">
-        <strong>Paciente:</strong> ${payload.paciente_nombre} (${payload.edad} años • ${payload.sexo === "F" ? "Femenino" : "Masculino"}) | Tel: ${payload.antecedentes.telefono || "—"} | Ocupación: ${payload.antecedentes.ocupacion || "—"}${tutorLine}<br/>
+        <strong>Paciente:</strong> ${payload.paciente_nombre} (${payload.edad} años • ${payload.sexo === "F" ? "Femenino" : "Masculino"}) | Tel: ${payload.antecedentes.telefono || "—"} | Ocupación: ${payload.antecedentes.ocupacion || "—"}${tutorLine}${socioLine}${personalLine}${gineLine}<br/>
         <strong>Antecedentes AHF:</strong> ${payload.antecedentes.heredofamiliares || "Sin registro"}<br/>
         <strong>Antropometría (${payload.antropometria.isakMode === "full" ? "ISAK 43" : "ISAK 21"}):</strong> Peso ${payload.antropometria.peso ?? "—"} kg | Cintura umbilical: ${payload.antropometria.cintura_umbilical ?? "—"} cm | IMC ${idxAnt.imc} (${idxAnt.imcDx})<br/>
         <strong>Composición:</strong> ${idxAnt.masasTexto} | IMLG: ${idxAnt.imlgFormatted} | ACT: ${idxAnt.actLitrosFormatted} (${idxAnt.actPctFormatted}) | Watson: ${idxAnt.watsonLitrosFormatted} (${idxAnt.watsonPctFormatted}) | Σ6: ${idxAnt.sum6} | Σ8: ${idxAnt.sum8}<br/>
@@ -822,7 +961,30 @@ function bindEvents() {
       objetivo: getVal("np_objetivo").trim(),
       tutor: tutorData,
       antecedentes: {
-        contactoEmergencia: tutorData ? `${tutorData.nombre} (${tutorData.parentesco}) - ${tutorData.telefono}` : ""
+        contactoEmergencia: tutorData ? `${tutorData.nombre} (${tutorData.parentesco}) - ${tutorData.telefono}` : "",
+        personales: {
+          enfermedadesDiagnosticadas: "",
+          enfermedadesAnteriores: "",
+          pesoFormaCorporal: "",
+          cirugiasPrevias: "",
+          hospitalizaciones: "",
+          alergiasAlimentarias: "",
+          intoleranciasAlimentarias: "",
+          tratamientoMedicoActual: "",
+          suplementosActuales: "",
+          interaccionFarmacoNutrimento: ""
+        },
+        ahf: createEmptyAhfStruct(""),
+        heredofamiliares: "",
+        ginecologicos: {
+          menarquia: null,
+          regularidad: "",
+          dolor: "",
+          embarazos: null,
+          abortos: null,
+          enfermedades: "",
+          anticonceptivos: ""
+        }
       },
       antropometria: {
         isakMode: "restricted",

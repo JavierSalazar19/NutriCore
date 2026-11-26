@@ -1,4 +1,4 @@
-const CACHE_NAME = "nutricore-pwa-v1.6.0";
+const CACHE_NAME = "nutricore-pwa-v1.6.1";
 
 const CORE_ASSETS = [
   "./",
@@ -14,10 +14,10 @@ const CORE_ASSETS = [
 ];
 
 self.addEventListener("install", (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ASSETS))
   );
-  self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
@@ -28,9 +28,8 @@ self.addEventListener("activate", (event) => {
           .filter((key) => key !== CACHE_NAME)
           .map((key) => caches.delete(key))
       )
-    )
+    ).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
 self.addEventListener("fetch", (event) => {
@@ -39,13 +38,15 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Navegación / HTML: intenta red y cae en index.html cacheado si no hay conexión
+  // Navegación / HTML: intenta red, actualiza caché y cae en index.html si no hay conexión
   if (event.request.mode === "navigate") {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put("./index.html", copy));
+          if (response && response.status === 200) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put("./index.html", copy));
+          }
           return response;
         })
         .catch(() => caches.match("./index.html"))
@@ -53,17 +54,16 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Archivos estáticos del mismo origen: cache-first con respaldo a red
+  // Archivos estáticos (CSS, JS, manifest, íconos): red primero para reflejar cambios al recargar, con respaldo a caché
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(event.request).then((response) => {
+    fetch(event.request)
+      .then((response) => {
         if (response && response.status === 200 && response.type === "basic") {
           const copy = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
         }
         return response;
-      });
-    })
+      })
+      .catch(() => caches.match(event.request))
   );
 });

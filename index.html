@@ -99,7 +99,7 @@
 
       <!-- ==================== PESTAÑA A: ANTECEDENTES ==================== -->
       <section id="tab-antecedentes" class="tab-panel active">
-        <div class="grid-2">
+        <div class="grid-2 antecedentes-top-grid">
           <div class="card">
             <h3>1. Información Personal y Contacto</h3>
             <div class="form-grid-2">
@@ -145,6 +145,51 @@
                   <option value="Viudo(a)">Viudo(a)</option>
                 </select>
               </div>
+              <div class="field">
+                <label>Etnia</label>
+                <input type="text" id="ant_etnia" placeholder="Ej. Mestiza, Yaqui, Mayo, Otra..." />
+              </div>
+              <div class="field">
+                <label>Religión</label>
+                <input type="text" id="ant_religion" placeholder="Ej. Católica, Cristiana, Ninguna..." />
+              </div>
+              <div class="field">
+                <label>Escolaridad</label>
+                <select id="ant_escolaridad">
+                  <option value="">Seleccionar...</option>
+                  <option value="Sin escolaridad">Sin escolaridad</option>
+                  <option value="Preescolar">Preescolar</option>
+                  <option value="Primaria">Primaria</option>
+                  <option value="Secundaria">Secundaria</option>
+                  <option value="Preparatoria / Bachillerato">Preparatoria / Bachillerato</option>
+                  <option value="Técnico / Carrera técnica">Técnico / Carrera técnica</option>
+                  <option value="Licenciatura / Ingeniería">Licenciatura / Ingeniería</option>
+                  <option value="Posgrado (Maestría / Doctorado)">Posgrado (Maestría / Doctorado)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Seguridad social</label>
+                <select id="ant_seguridad_social">
+                  <option value="">Seleccionar...</option>
+                  <option value="IMSS">IMSS</option>
+                  <option value="ISSSTE / ISSSTESON">ISSSTE / ISSSTESON</option>
+                  <option value="IMSS-Bienestar">IMSS-Bienestar</option>
+                  <option value="Seguro privado / Gastos médicos mayores">Seguro privado / Gastos médicos mayores</option>
+                  <option value="Sin seguridad social">Sin seguridad social</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Nivel socioeconómico percibido</label>
+                <select id="ant_nse">
+                  <option value="">Seleccionar...</option>
+                  <option value="Bajo">Bajo</option>
+                  <option value="Medio-bajo">Medio-bajo</option>
+                  <option value="Medio">Medio</option>
+                  <option value="Medio-alto">Medio-alto</option>
+                  <option value="Alto">Alto</option>
+                </select>
+              </div>
             </div>
             <div class="field">
               <label>Domicilio / Ciudad</label>
@@ -157,30 +202,265 @@
           </div>
 
           <div class="card">
-            <h3>2. Antecedentes Personales y Heredofamiliares</h3>
+            <h3>2. Antecedentes Personales</h3>
             <div class="field">
               <label>Objetivo / Motivo principal de consulta</label>
               <input type="text" id="ant_objetivo" placeholder="Ej. Control metabólico, ganancia muscular..." />
             </div>
+            <div class="form-grid-2">
+              <div class="field">
+                <label>Enfermedades diagnosticadas</label>
+                <textarea id="ant_per_enfermedades_diag" rows="2" placeholder="Ej. Prediabetes, SOP, HTA, dislipidemia..."></textarea>
+              </div>
+              <div class="field">
+                <label>Enfermedades relevantes anteriores</label>
+                <textarea id="ant_per_enfermedades_previas" rows="2" placeholder="Ej. Dengue, anemia previa, infecciones recurrentes..."></textarea>
+              </div>
+              <div class="field">
+                <label>Cirugías previas</label>
+                <textarea id="ant_per_cirugias" rows="2" placeholder="Ej. Apendicectomía (2013), cesárea..."></textarea>
+              </div>
+              <div class="field">
+                <label>Hospitalizaciones</label>
+                <textarea id="ant_per_hospitalizaciones" rows="2" placeholder="Motivo, año aproximado o sin hospitalizaciones..."></textarea>
+              </div>
+              <div class="field">
+                <label>Alergias alimentarias</label>
+                <textarea id="ant_per_alergias_alim" rows="2" placeholder="Ej. Mariscos, cacahuate, huevo, ninguna..."></textarea>
+              </div>
+              <div class="field">
+                <label>Intolerancias alimentarias</label>
+                <textarea id="ant_per_intolerancias_alim" rows="2" placeholder="Ej. Lactosa, fructosa, gluten/FODMAP..."></textarea>
+              </div>
+              <div class="field">
+                <label>Tratamiento médico actual</label>
+                <textarea id="ant_per_tratamiento_actual" rows="2" placeholder="Fármacos, dosis y horarios actuales..."></textarea>
+              </div>
+              <div class="field">
+                <label>Suplementos actuales</label>
+                <textarea id="ant_per_suplementos_actuales" rows="2" placeholder="Ej. Vitamina D3, hierro, omega-3, proteína..."></textarea>
+              </div>
+            </div>
             <div class="field">
-              <label>Antecedentes Personales Patológicos (enfermedades crónicas, cirugías, hospitalizaciones)</label>
-              <textarea id="ant_patologicos" rows="3" placeholder="Ej. Diabetes tipo 2, hipertensión, SOP, cirugía previa..."></textarea>
+              <label>Uso de suplementos o medicamentos para cambiar el peso o forma corporal</label>
+              <textarea id="ant_per_peso_forma" rows="2" placeholder="Ej. Termogénicos, laxantes, diuréticos, análogos GLP-1, quemadores, ninguno..."></textarea>
+            </div>
+            <div class="field">
+              <label>Interacción fármaco nutrimento</label>
+              <textarea id="ant_per_interaccion_fn" rows="2" placeholder="Ej. Metformina y absorción de B12, levotiroxina en ayuno, calcio/hierro..."></textarea>
+            </div>
+            <div class="field">
+              <label>Antecedentes Personales Patológicos (resumen / notas adicionales)</label>
+              <textarea id="ant_patologicos" rows="2" placeholder="Observaciones patológicas complementarias..."></textarea>
             </div>
             <div class="field">
               <label>Antecedentes Personales No Patológicos (entorno, turnos, inmunizaciones, hábitos generales)</label>
-              <textarea id="ant_no_patologicos" rows="3" placeholder="Ej. Turnos rotativos, exposición laboral, vacunas..."></textarea>
+              <textarea id="ant_no_patologicos" rows="2" placeholder="Ej. Turnos rotativos, exposición laboral, vacunas..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="card ahf-card" style="margin-top: 1.25rem;">
+          <div class="ahf-header">
+            <h3>3. Antecedentes Heredofamiliares</h3>
+            <p class="ahf-subtitle">
+              Marca las condiciones presentes en la familia, especifica el tipo o detalle cuando aplique e indica qué familiar(es) la padecen.
+            </p>
+          </div>
+
+          <div class="ahf-col-headers">
+            <span>Condición</span>
+            <span>Tipo / Detalle</span>
+            <span>Familiar que la padece</span>
+          </div>
+
+          <div class="ahf-list">
+            <!-- Trigliceridemia -->
+            <div class="ahf-row">
+              <label class="ahf-check-label" for="ahf_chk_trigliceridemia">
+                <input type="checkbox" id="ahf_chk_trigliceridemia" />
+                <span>Trigliceridemia</span>
+              </label>
+              <span class="ahf-tag-muted">Hipertrigliceridemia familiar</span>
+              <input type="text" id="ahf_fam_trigliceridemia" placeholder="Familiar (ej. Padre, abuelo)" />
+            </div>
+
+            <!-- Hipercolesterolemia -->
+            <div class="ahf-row">
+              <label class="ahf-check-label" for="ahf_chk_hipercolesterolemia">
+                <input type="checkbox" id="ahf_chk_hipercolesterolemia" />
+                <span>Hipercolesterolemia</span>
+              </label>
+              <span class="ahf-tag-muted">Colesterol elevado familiar</span>
+              <input type="text" id="ahf_fam_hipercolesterolemia" placeholder="Familiar (ej. Madre, tío)" />
+            </div>
+
+            <!-- Diabetes tipo 1 -->
+            <div class="ahf-row">
+              <label class="ahf-check-label" for="ahf_chk_dm1">
+                <input type="checkbox" id="ahf_chk_dm1" />
+                <span>Diabetes tipo 1</span>
+              </label>
+              <span class="ahf-tag-muted">DM1</span>
+              <input type="text" id="ahf_fam_dm1" placeholder="Familiar" />
+            </div>
+
+            <!-- Diabetes tipo 2 -->
+            <div class="ahf-row">
+              <label class="ahf-check-label" for="ahf_chk_dm2">
+                <input type="checkbox" id="ahf_chk_dm2" />
+                <span>Diabetes tipo 2</span>
+              </label>
+              <span class="ahf-tag-muted">DM2</span>
+              <input type="text" id="ahf_fam_dm2" placeholder="Familiar (ej. Abuelo materno)" />
+            </div>
+
+            <!-- Hipertensión arterial -->
+            <div class="ahf-row">
+              <label class="ahf-check-label" for="ahf_chk_hta">
+                <input type="checkbox" id="ahf_chk_hta" />
+                <span>Hipertensión arterial</span>
+              </label>
+              <span class="ahf-tag-muted">HAS</span>
+              <input type="text" id="ahf_fam_hta" placeholder="Familiar (ej. Padre)" />
+            </div>
+
+            <!-- Cáncer -->
+            <div class="ahf-row">
+              <label class="ahf-check-label" for="ahf_chk_cancer">
+                <input type="checkbox" id="ahf_chk_cancer" />
+                <span>Cáncer</span>
+              </label>
+              <input type="text" id="ahf_det_cancer" placeholder="Especificar el tipo" />
+              <input type="text" id="ahf_fam_cancer" placeholder="Familiar" />
+            </div>
+
+            <!-- Enfermedad cardiovascular -->
+            <div class="ahf-row">
+              <label class="ahf-check-label" for="ahf_chk_cv">
+                <input type="checkbox" id="ahf_chk_cv" />
+                <span>Enfermedad cardiovascular</span>
+              </label>
+              <input type="text" id="ahf_det_cv" placeholder="Especificar cuál (ej. IAM, arritmia)" />
+              <input type="text" id="ahf_fam_cv" placeholder="Familiar" />
+            </div>
+
+            <!-- Enfermedad autoinmune -->
+            <div class="ahf-row">
+              <label class="ahf-check-label" for="ahf_chk_autoinmune">
+                <input type="checkbox" id="ahf_chk_autoinmune" />
+                <span>Enfermedad autoinmune</span>
+              </label>
+              <input type="text" id="ahf_det_autoinmune" placeholder="Especificar cuál (ej. Lupus, AR)" />
+              <input type="text" id="ahf_fam_autoinmune" placeholder="Familiar" />
+            </div>
+
+            <!-- Enfermedad renal -->
+            <div class="ahf-row">
+              <label class="ahf-check-label" for="ahf_chk_renal">
+                <input type="checkbox" id="ahf_chk_renal" />
+                <span>Enfermedad renal</span>
+              </label>
+              <input type="text" id="ahf_det_renal" placeholder="Especificar cuál (ej. ERC, litiasis)" />
+              <input type="text" id="ahf_fam_renal" placeholder="Familiar" />
+            </div>
+
+            <!-- Enfermedad mental -->
+            <div class="ahf-row">
+              <label class="ahf-check-label" for="ahf_chk_mental">
+                <input type="checkbox" id="ahf_chk_mental" />
+                <span>Enfermedad mental</span>
+              </label>
+              <input type="text" id="ahf_det_mental" placeholder="Especificar cuál (ej. Depresión, ansiedad)" />
+              <input type="text" id="ahf_fam_mental" placeholder="Familiar" />
+            </div>
+
+            <!-- Enfermedad neurológica -->
+            <div class="ahf-row">
+              <label class="ahf-check-label" for="ahf_chk_neuro">
+                <input type="checkbox" id="ahf_chk_neuro" />
+                <span>Enfermedad neurológica</span>
+              </label>
+              <input type="text" id="ahf_det_neuro" placeholder="Especificar cuál (ej. Migraña, EVC)" />
+              <input type="text" id="ahf_fam_neuro" placeholder="Familiar" />
+            </div>
+
+            <!-- Enfermedad tiroidea -->
+            <div class="ahf-row">
+              <label class="ahf-check-label" for="ahf_chk_tiroidea">
+                <input type="checkbox" id="ahf_chk_tiroidea" />
+                <span>Enfermedad tiroidea</span>
+              </label>
+              <input type="text" id="ahf_det_tiroidea" placeholder="Especificar cuál (ej. Hipotiroidismo)" />
+              <input type="text" id="ahf_fam_tiroidea" placeholder="Familiar (ej. Madre)" />
+            </div>
+
+            <!-- Otras -->
+            <div class="ahf-row">
+              <label class="ahf-check-label" for="ahf_chk_otras">
+                <input type="checkbox" id="ahf_chk_otras" />
+                <span>Otras</span>
+              </label>
+              <input type="text" id="ahf_det_otras" placeholder="Especificar otra condición" />
+              <input type="text" id="ahf_fam_otras" placeholder="Familiar" />
+            </div>
+          </div>
+
+          <div class="field" style="margin-top: 1rem;">
+            <label>Observaciones / Resumen de Antecedentes Heredofamiliares</label>
+            <textarea id="ant_heredofamiliares" rows="2" placeholder="Notas adicionales o resumen heredofamiliar..."></textarea>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 1.25rem;">
+          <h3>4. Antecedentes Ginecológicos</h3>
+          <div class="form-grid-4">
+            <div class="field">
+              <label>Menarquia (edad en años)</label>
+              <input type="number" step="0.1" min="6" max="25" id="ant_gine_menarquia" placeholder="Ej. 12" />
             </div>
             <div class="field">
-              <label>Antecedentes Heredofamiliares (padres, abuelos, hermanos)</label>
-              <textarea id="ant_heredofamiliares" rows="3" placeholder="Ej. Padre con DM2 e HTA, madre con hipotiroidismo..."></textarea>
+              <label>Regularidad del ciclo menstrual</label>
+              <select id="ant_gine_regularidad">
+                <option value="">Seleccionar / No aplica...</option>
+                <option value="Regular (21-35 días)">Regular (21-35 días)</option>
+                <option value="Irregular">Irregular</option>
+                <option value="Amenorrea">Amenorrea</option>
+                <option value="Pre-menarquia / Menopausia">Pre-menarquia / Menopausia</option>
+              </select>
             </div>
+            <div class="field">
+              <label>Dolor menstrual (dismenorrea)</label>
+              <select id="ant_gine_dolor">
+                <option value="">Seleccionar / No aplica...</option>
+                <option value="Sin dolor">Sin dolor</option>
+                <option value="Leve">Leve</option>
+                <option value="Moderado">Moderado</option>
+                <option value="Severo / Incapacitante">Severo / Incapacitante</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Embarazos previos (gestas)</label>
+              <input type="number" min="0" max="30" id="ant_gine_embarazos" placeholder="Ej. 0" />
+            </div>
+            <div class="field">
+              <label>Abortos</label>
+              <input type="number" min="0" max="30" id="ant_gine_abortos" placeholder="Ej. 0" />
+            </div>
+            <div class="field">
+              <label>Anticonceptivos</label>
+              <input type="text" id="ant_gine_anticonceptivos" placeholder="Ej. Ninguno, DIU, anticonceptivos orales..." />
+            </div>
+          </div>
+          <div class="field" style="margin-top: 0.5rem;">
+            <label>Enfermedades ginecológicas diagnosticadas</label>
+            <textarea id="ant_gine_enfermedades" rows="2" placeholder="Ej. Síndrome de ovario poliquístico (SOP), endometriosis, miomas, ninguna..."></textarea>
           </div>
         </div>
       </section>
 
       <!-- ==================== PESTAÑA B: ANTROPOMÉTRICA ==================== -->
       <section id="tab-antropo" class="tab-panel">
-        <!-- 1. Medidas Clave e Índices Rápidos -->
         <div class="grid-2">
           <div class="card">
             <h3>1. Medidas Clave e Índices Rápidos</h3>
@@ -226,7 +506,6 @@
             </div>
           </div>
 
-          <!-- 2. Bioimpedancia Eléctrica (BIA) -->
           <div class="card">
             <div class="card-header-flex">
               <h3>2. Bioimpedancia Eléctrica (BIA)</h3>
@@ -400,7 +679,6 @@
             </div>
           </div>
 
-          <!-- Contenedor de 21 mediciones (Perfil Restringido) -->
           <div id="isakRestrictedContainer">
             <h4 class="isak-sub">A. Básicos y Referencia (4 mediciones del núcleo restringido)</h4>
             <div class="form-grid-4">
@@ -440,7 +718,6 @@
             </div>
           </div>
 
-          <!-- Contenedor adicional para completar las 43 mediciones del Perfil Completo ISAK -->
           <div id="isakFullContainer" class="hidden">
             <h4 class="isak-sub">E. Diámetros Óseos Adicionales — Perfil Completo (3 mediciones en cm)</h4>
             <div class="form-grid-4">
@@ -478,7 +755,6 @@
           </div>
         </div>
 
-        <!-- 4. Sumatorias, Masas, Agua Corporal, Fórmulas % Grasa y Somatotipo -->
         <div class="grid-2">
           <div class="card results-card">
             <h3>4. Composición Corporal, Agua e Índices Derivados</h3>
